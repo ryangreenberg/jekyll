@@ -22,8 +22,8 @@ module Jekyll
     # This migrator will include posts from all entries across all blogs. If
     # you've got unpublished, deleted or otherwise hidden posts please sift
     # through the created posts to make sure nothing is accidently published.
-    def self.process(dbname, user, pass, host = 'localhost')
-      db = Sequel.mysql(dbname, :user => user, :password => pass, :host => host, :encoding => 'utf8')
+    def self.process(dbname, user, pass, host = 'localhost', db_encoding = 'utf8', src_encoding = 'utf-8', dest_encoding = 'utf-8')
+      db = Sequel.mysql(dbname, :user => user, :password => pass, :host => host, :encoding => db_encoding)
 
       FileUtils.mkdir_p "_posts"
 
@@ -31,22 +31,27 @@ module Jekyll
 
       posts = db[:mt_entry]
       posts.each do |post|
-        title = post[:entry_title]
-        basename = post[:entry_basename]
-        slug = basename.gsub(/_/, '-')
+        raw_title = post[:entry_title]
+        raw_basename = post[:entry_basename]
+        slug = raw_basename.gsub(/_/, '-')
         date = post[:entry_authored_on]
         status = post[:entry_status]
         content = post[:entry_text]
         more_content = post[:entry_text_more]
-        excerpt = post[:entry_excerpt]
+        raw_excerpt = post[:entry_excerpt]
         entry_convert_breaks = post[:entry_convert_breaks]
-        categories = post_categories.filter(:mt_placement__placement_entry_id => post[:id]).
-          map {|ea| ea[:category_basename] }
+        categories = post_categories.filter(:mt_placement__placement_entry_id => post[:entry_id]).
+          map {|ea| convert_encoding(ea[:category_basename], src_encoding, dest_encoding) }
 
         # Be sure to include the body and extended body.
         if more_content != nil
           content = content + " \n" + more_content
         end
+
+        # Convert string encodings
+        title = convert_encoding(raw_title, src_encoding, dest_encoding)
+        excerpt = convert_encoding(raw_excerpt, src_encoding, dest_encoding)
+        basename = convert_encoding(raw_basename, src_encoding, dest_encoding)
 
         # Ideally, this script would determine the post format (markdown,
         # html, etc) and create files with proper extensions. At this point
@@ -91,6 +96,10 @@ module Jekyll
         # Other values might need custom work.
         entry_type
       end
+    end
+
+    def self.convert_encoding(str, src, dest)
+      str.respond_to?(:encode) ? str.force_encoding(src).encode(dest) : str
     end
   end
 end
