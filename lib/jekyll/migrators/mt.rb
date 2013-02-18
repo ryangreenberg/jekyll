@@ -72,7 +72,7 @@ module Jekyll
     end
 
     def self.suffix(entry_type)
-      if entry_type.nil? || entry_type.include?("markdown")
+      if entry_type.nil? || entry_type.include?("markdown") || entry_type.include?("__default__")
         # The markdown plugin I have saves this as
         # "markdown_with_smarty_pants", so I just look for "markdown".
         "markdown"
