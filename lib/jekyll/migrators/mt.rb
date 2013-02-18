@@ -58,7 +58,7 @@ module Jekyll
            'layout' => 'post',
            'title' => title.to_s,
            'mt_id' => post[:entry_id],
-           'date' => date,
+           'date' => date.strftime("%Y-%m-%d %H:%M:%S %z"),
            'permalink_name' => basename,
            'excerpt' => excerpt
         }
