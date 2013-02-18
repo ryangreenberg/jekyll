@@ -36,6 +36,7 @@ module Jekyll
         status = post[:entry_status]
         content = post[:entry_text]
         more_content = post[:entry_text_more]
+        excerpt = post[:entry_excerpt]
         entry_convert_breaks = post[:entry_convert_breaks]
 
         # Be sure to include the body and extended body.
@@ -54,7 +55,8 @@ module Jekyll
            'title' => title.to_s,
            'mt_id' => post[:entry_id],
            'date' => date,
-           'permalink_name' => basename
+           'permalink_name' => basename,
+           'excerpt' => excerpt
         }
 
         data['published'] = false unless status == STATUS_PUBLISHED
