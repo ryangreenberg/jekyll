@@ -69,7 +69,7 @@ module Jekyll
         }
 
         data['published'] = false unless status == STATUS_PUBLISHED
-        data['categories'] = categories unless categories.empty?
+        data['mt_categories'] = categories unless categories.empty?
 
         yaml_front_matter = data.delete_if { |k,v| v.nil? || v == '' }.to_yaml
 
