@@ -30,7 +30,8 @@ module Jekyll
       posts = db[:mt_entry]
       posts.each do |post|
         title = post[:entry_title]
-        slug = post[:entry_basename].gsub(/_/, '-')
+        basename = post[:entry_basename]
+        slug = basename.gsub(/_/, '-')
         date = post[:entry_authored_on]
         status = post[:entry_status]
         content = post[:entry_text]
@@ -52,7 +53,8 @@ module Jekyll
            'layout' => 'post',
            'title' => title.to_s,
            'mt_id' => post[:entry_id],
-           'date' => date
+           'date' => date,
+           'permalink_name' => basename
         }
 
         data['published'] = false unless status == STATUS_PUBLISHED
