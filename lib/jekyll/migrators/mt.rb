@@ -27,6 +27,8 @@ module Jekyll
 
       FileUtils.mkdir_p "_posts"
 
+      post_categories = db[:mt_placement].join(:mt_category, :category_id=>:placement_category_id)
+
       posts = db[:mt_entry]
       posts.each do |post|
         title = post[:entry_title]
@@ -38,6 +40,8 @@ module Jekyll
         more_content = post[:entry_text_more]
         excerpt = post[:entry_excerpt]
         entry_convert_breaks = post[:entry_convert_breaks]
+        categories = post_categories.filter(:mt_placement__placement_entry_id => post[:id]).
+          map {|ea| ea[:category_basename] }
 
         # Be sure to include the body and extended body.
         if more_content != nil
@@ -60,6 +64,7 @@ module Jekyll
         }
 
         data['published'] = false unless status == STATUS_PUBLISHED
+        data['categories'] = categories unless categories.empty?
 
         yaml_front_matter = data.delete_if { |k,v| v.nil? || v == '' }.to_yaml
 
